@@ -128,6 +128,42 @@ void LinkedList<T>::insertOrdered(const T& newData) {
   // to update all next, prev, head_, and tail_ pointers as needed on your
   // new node or on those existing nodes that are adjacent to the new node.
 
+  Node* node = new Node(newData);
+  if (size_ == 0) {
+    head_ = node;
+    tail_ = node;
+    size_ += 1;
+    return;
+  }
+  Node* prev = nullptr;
+  Node* cur = head_;
+  if (head_->data > newData) {
+    node->next = head_;
+    head_->prev = node;
+    head_ = node;
+    size_ += 1;
+    return;
+  }
+  if (tail_->data < newData) {
+    tail_->next = node;
+    node->prev = tail_;
+    tail_ = node;
+    size_ += 1;
+    return;
+  }
+  while (cur) {
+    if (cur->data > newData) {
+      node->next = cur;
+      node->prev = prev;
+      prev->next = node;
+      cur->prev = node;
+      size_ += 1;
+      return;
+    }
+    prev = cur;
+    cur = cur->next;
+  }
+
 }
 
 /********************************************************************
@@ -228,7 +264,30 @@ LinkedList<T> LinkedList<T>::merge(const LinkedList<T>& other) const {
   // -----------------------------------------------------------
   // Please implement this function according to the description
   // above and in the instructions PDF.
+  while (!left.empty() || !right.empty()) {
+    if (left.empty()) {
+      while (!right.empty()) {
+        merged.pushBack(right.front());
+        right.popFront();
+      }
+      break;
+    }
+    if (right.empty()) {
+      while (!left.empty()) {
+        merged.pushBack(left.front());
+        left.popFront();
+      }
+      break;
+    }
 
+    if (left.front() < right.front()) {
+      merged.pushBack(left.front());
+      left.popFront();
+    } else {
+      merged.pushBack(right.front());
+      right.popFront();
+    }
+  }
   // Hints:
   // 1. Assuming that the left and right lists are already sorted, remember
   //    that the smallest items are already available at the front. You can
