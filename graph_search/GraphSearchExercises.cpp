@@ -52,7 +52,10 @@ int GridGraph::countEdges() const {
   // =======================================================================
   // TODO: Your code here!
   // =======================================================================
-
+  for (const auto &point : adjacencyMap) {
+      numEdges += point.second.size();
+  }
+  numEdges = numEdges / 2;
   return numEdges;
 }
 
@@ -92,7 +95,9 @@ void GridGraph::removePoint(const IntPair& p1) {
   // =======================================================================
   // TODO: Your code here!
   // =======================================================================
-
+  for (auto &i: originalNeighbors) {
+      adjacencyMap[i].erase(p1);
+  }
   // Finally, for the one point we are removing, erase the point key itself
   // from adjacencyMap directly. (There is no other GridGraph helper function
   // for this, because that's what we're implementing right now! We need to
@@ -101,6 +106,14 @@ void GridGraph::removePoint(const IntPair& p1) {
   // =======================================================================
   // TODO: Your code here!
   // =======================================================================
+  for (auto i = adjacencyMap.begin(); i != adjacencyMap.end();) {
+      if (i->first == p1) {
+          i = adjacencyMap.erase(i);
+          break;
+      } else {
+          i++;
+      }
+  }
 }
 
 // =========================================================================
@@ -295,7 +308,7 @@ std::list<IntPair> graphBFS(const IntPair& start, const IntPair& goal, const Gri
     // TODO: Your code here!
     // We'll need to loop over the neighbors that are the points adjacent to curPoint.
     // Get a copy of the set of neighbors we're going to loop over.
-    GridGraph::NeighborSet neighbors; // Change this...
+    GridGraph::NeighborSet neighbors = graph.adjacencyMap.at(curPoint);
     // =====================================================================
 
     for (auto neighbor : neighbors) {
@@ -303,7 +316,7 @@ std::list<IntPair> graphBFS(const IntPair& start, const IntPair& goal, const Gri
       // ==================================================================
       // TODO: Your code here!
       // Check whether the neighbor has already been visited.
-      bool neighborWasAlreadyVisited = false; // Change this...
+      bool neighborWasAlreadyVisited = visitedSet.find(neighbor) != visitedSet.end();
       // ==================================================================
 
       // If this adjacent vertex has NOT been visited before, we will visit it now.
@@ -313,6 +326,10 @@ std::list<IntPair> graphBFS(const IntPair& start, const IntPair& goal, const Gri
 
         // ================================================================
         // TODO: Your code here!
+        pred[neighbor] = curPoint;
+        visitedSet.insert(neighbor);
+        exploreQ.push(neighbor);
+
 
         // Record that the curPoint is the predecessor of the neighbor point,
         // since curPoint has just led to the discovery of this neighbor for
@@ -511,7 +528,7 @@ std::list<PuzzleState> puzzleBFS(const PuzzleState& start, const PuzzleState& go
     // We'll need to loop over the neighbors that are the points adjacent to curState.
     // We need a collection of neighbors we're going to loop over.
     
-    auto neighbors = {start}; // Change this! This line is totally wrong.
+    auto neighbors = curState.getAdjacentStates();
 
     // Hint: Look at PuzzleState.h
     // =====================================================================
@@ -521,13 +538,16 @@ std::list<PuzzleState> puzzleBFS(const PuzzleState& start, const PuzzleState& go
       // ==================================================================
       // TODO: Your code here!
       // Check whether the neighbor has already been visited.
-      bool neighborWasAlreadyVisited = false; // Change this...
+      bool neighborWasAlreadyVisited = visitedSet.find(neighbor) != visitedSet.end();
       // ==================================================================
 
       if (!neighborWasAlreadyVisited) {
 
         // ================================================================
         // TODO: Your code here!
+        pred[neighbor] = curState;
+        visitedSet.insert(neighbor);
+        exploreQ.push(neighbor);
 
         // Record that the curState is the predecessor of the neighbor point,
         // since curState has just led to the discovery of this neighbor for
